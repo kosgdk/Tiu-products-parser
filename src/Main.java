@@ -4,12 +4,23 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Main {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
 
+
+        ParserGlavbritva parser = new ParserGlavbritva();
+        ArrayList<Product> products = parser.parse();
+
+        for (Product product : products) {
+            System.out.println(product + "\n");
+        }
+
+        System.out.println("Total products count: " + products.size());
+/*
         String host = "http://glavbritva.ru";
         String url = host + "/product_list?product_items_per_page=48";
         Document doc = Jsoup.connect(url).get();
@@ -73,6 +84,7 @@ public class Main {
         }
 
         return floatPrice;
+        */
     }
 
 }
