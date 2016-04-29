@@ -48,14 +48,15 @@ public class Main {
             String image = imageElement.attr("src");
             String description = imageElement.attr("alt");
             float price = priceToFloat(item.select("div[class=b-product-line__price]").first().text());
-            String available = item.select("span[class=b-product-line__state]").first().text();
+            String strAvailable = item.select("span[class=b-product-line__state]").first().text();
+            //int available ? !strAvailable.equals("В наличии"),1,0;
 
             System.out.println( "ID: "+ id + "\n" +
                     "Link: " + link + "\n" +
                     "Image: " + image + "\n" +
                     "Description: " + description + "\n" +
                     "Price: " + price + "\n" +
-                    "Available: " + available + "\n"
+                    "Available: " + strAvailable + "\n"
             );
         }
         return n;
@@ -73,5 +74,5 @@ public class Main {
 
         return floatPrice;
     }
-    
+
 }
