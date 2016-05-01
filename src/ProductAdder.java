@@ -89,7 +89,7 @@ public class ProductAdder {
                 .build();
 
         httppost.setEntity(httpEntity);
-        String JSONProductId = makePOST(httppost);
+        String JSONProductId = POSTSender.send(httppost);
 
         System.out.println("Product added: " + JSONProductId);
     }
@@ -106,7 +106,7 @@ public class ProductAdder {
                 .addTextBody("access_token", token)
                 .build();
         httppost.setEntity(httpEntity);
-        response = makePOST(httppost);
+        response = POSTSender.send(httppost);
 
         // Парсим JSON и выдираем URL
         JsonParser JSONparser = new JsonParser();
@@ -140,8 +140,6 @@ public class ProductAdder {
                 "\ncrop_data: " + crop_data +
                 "\ncrop_hash: " + crop_hash);
 
-
-
         // 3 шаг - отправляем полученные данные методу photos.saveMarketPhoto
         httppost = new HttpPost(apiURL + "photos.saveMarketPhoto");
         httpEntity = MultipartEntityBuilder.create()
@@ -154,7 +152,7 @@ public class ProductAdder {
                 .addTextBody("access_token", token)
                 .build();
         httppost.setEntity(httpEntity);
-        String photoJSONdata = makePOST(httppost);
+        String photoJSONdata = POSTSender.send(httppost);
 
         // Парсим идентификатор фотографии
         JSONparser = new JsonParser();
@@ -165,71 +163,15 @@ public class ProductAdder {
         return photoId;
     }
 
-    private String makeGet (String url){
-
-        CloseableHttpClient httpclient = HttpClients.createDefault();
-
-            HttpGet httpget = new HttpGet(url);
-            ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
-                public String handleResponse(final HttpResponse response) throws IOException {
-                    HttpEntity entity = response.getEntity();
-                    return EntityUtils.toString(entity);
-                }
-            };
-
-        try {
-
-            return httpclient.execute(httpget, responseHandler);
-
-        } catch (IOException e){
-            System.out.println("Something wrong with GET request.");
-            e.printStackTrace();
-        }
-
-        return null;
-    }
 
     private String POSTImage(String url, File imageFile){
 
         HttpEntity entity = MultipartEntityBuilder.create().addBinaryBody("file", imageFile, ContentType.create("application/octet-stream"), imageFile.getName()).build();
         HttpPost httppost = new HttpPost(url);
         httppost.setEntity(entity);
-        return makePOST(httppost);
+        return POSTSender.send(httppost);
     }
 
-    private String makePOST(HttpPost httppost){
 
-        //CloseableHttpClient httpclient = HttpClients.createDefault();
-
-        RequestConfig globalConfig = RequestConfig.custom()
-                .setCookieSpec(CookieSpecs.IGNORE_COOKIES)
-                .build();
-        CloseableHttpClient httpclient = HttpClients.custom()
-                .setDefaultRequestConfig(globalConfig)
-                .build();
-        /*
-        RequestConfig localConfig = RequestConfig.copy(globalConfig)
-                .setCookieSpec(CookieSpecs.STANDARD_STRICT)
-                .build();
-        */
-
-        ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
-            public String handleResponse(final HttpResponse response) throws IOException {
-                HttpEntity entity = response.getEntity();
-                return EntityUtils.toString(entity);
-            }
-        };
-
-        try {
-
-            return httpclient.execute(httppost, responseHandler);
-
-        } catch (IOException e){
-            System.out.println("Something wrong with POST request.");
-            e.printStackTrace();
-        }
-
-        return null;
-    }
 
 }
