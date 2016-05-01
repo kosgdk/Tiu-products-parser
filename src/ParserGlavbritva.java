@@ -62,14 +62,21 @@ public class ParserGlavbritva {
             String id = item.select("span").first().attr("title");
             String link = item.select("a").first().attr("href");
             Element imageElement = item.select("img").first();
-            String imageLink = imageElement.attr("longdesc");
+            String imageLink = imageElement.attr("src");
+
+            // Парсим изображение
+            CharSequence imageMask = "_w200_h200_";
+            if (!imageLink.contains(imageMask)){
+                imageLink = imageElement.attr("longdesc");
+            }
             imageLink = imageLink.replaceAll("_w200_h200_", "_w640_h640_");
+
             String name = imageElement.attr("alt");
             float price = priceToFloat(item.select("div[class=b-product-line__price]").first().text());
             String strAvailable = item.select("span[class=b-product-line__state]").first().text();
             boolean available = strAvailable.equals("В наличии");
 
-            /*
+
             System.out.println( "ID: "+ id + "\n" +
                     "Link: " + link + "\n" +
                     "Image: " + imageLink + "\n" +
@@ -77,7 +84,7 @@ public class ParserGlavbritva {
                     "Price: " + price + "\n" +
                     "Available: " + strAvailable + "\n"
             );
-            */
+
 
             products.add(new Product(id, name, link, imageLink, available, price));
         }

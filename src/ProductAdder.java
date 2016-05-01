@@ -3,6 +3,8 @@ import com.google.gson.JsonParser;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.config.CookieSpecs;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
@@ -22,18 +24,15 @@ import java.util.regex.Pattern;
 
 public class ProductAdder {
 
+    private String apiURL = "https://api.vk.com/method/";
     private int emptyPhotoId = 413141791;
     private String groupId = "120338153";
-    private String token = null;
+    private String token;
+    String response;
 
     public ProductAdder() {
         // Получаем access token
         this.token = getAccessToken();
-    }
-
-    public void add(Product product){
-
-        createProduct(product);
 
     }
 
@@ -63,7 +62,7 @@ public class ProductAdder {
         return token;
     }
 
-    private void createProduct(Product product){
+    public void addProduct(Product product){
 
         String productName = product.getName();
         String productDescription = productName + "\n" + product.getLink();
@@ -72,9 +71,9 @@ public class ProductAdder {
         int isDeleted = product.isDeleted();
         String imageLink = product.getImageLink();
 
-        ImageChecker imageChecker = new ImageChecker(imageLink);
-
-        int photoId = addImage(imageChecker.getImageFile());
+        // Проверяем фото на валидность и соответствие размеру (не мене 400х400)
+        ImageChecker imageChecker = new ImageChecker();
+        int photoId = addImage(imageChecker.getImageFile(imageLink));
 
         // Создаём новый товар
         HttpPost httppost = new HttpPost("https://api.vk.com/method/market.add");
@@ -98,7 +97,16 @@ public class ProductAdder {
     private int addImage(File imageFile){
 
         // 1 шаг - получаем URL для загрузки фото у метода photos.getMarketUploadServer
-        String response = makeGet("https://api.vk.com/method/photos.getMarketUploadServer?group_id=120338153&main_photo=1&access_token=" + token);
+        //String response = makeGet("https://api.vk.com/method/photos.getMarketUploadServer?group_id=120338153&main_photo=1&access_token=" + token);
+
+        HttpPost httppost = new HttpPost(apiURL + "photos.getMarketUploadServer");
+        HttpEntity httpEntity = MultipartEntityBuilder.create()
+                .addTextBody("group_id", groupId)
+                .addTextBody("main_photo", "1")
+                .addTextBody("access_token", token)
+                .build();
+        httppost.setEntity(httpEntity);
+        response = makePOST(httppost);
 
         // Парсим JSON и выдираем URL
         JsonParser JSONparser = new JsonParser();
@@ -124,18 +132,19 @@ public class ProductAdder {
         String crop_hash = mainJSONobject.get("crop_hash").getAsString();
 
         //DEBUG
-        //System.out.println("Данные для загрузки фото:");
-        /*System.out.println("server: " + server +
+        System.out.println("Данные для загрузки фото:");
+        System.out.println("server: " + server +
                 "\nphoto: " + photo +
                 // "group_id: " + group_id +
                 "\nhash: " + hash +
                 "\ncrop_data: " + crop_data +
+                "\ncrop_hash: " + crop_hash);
 
-        */
+
 
         // 3 шаг - отправляем полученные данные методу photos.saveMarketPhoto
-        HttpPost httppost = new HttpPost("https://api.vk.com/method/photos.saveMarketPhoto");
-        HttpEntity httpEntity = MultipartEntityBuilder.create()
+        httppost = new HttpPost(apiURL + "photos.saveMarketPhoto");
+        httpEntity = MultipartEntityBuilder.create()
                 .addTextBody("group_id", groupId)
                 .addTextBody("server", server)
                 .addTextBody("photo", photo)
@@ -190,7 +199,19 @@ public class ProductAdder {
 
     private String makePOST(HttpPost httppost){
 
-        CloseableHttpClient httpclient = HttpClients.createDefault();
+        //CloseableHttpClient httpclient = HttpClients.createDefault();
+
+        RequestConfig globalConfig = RequestConfig.custom()
+                .setCookieSpec(CookieSpecs.IGNORE_COOKIES)
+                .build();
+        CloseableHttpClient httpclient = HttpClients.custom()
+                .setDefaultRequestConfig(globalConfig)
+                .build();
+        /*
+        RequestConfig localConfig = RequestConfig.copy(globalConfig)
+                .setCookieSpec(CookieSpecs.STANDARD_STRICT)
+                .build();
+        */
 
         ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
             public String handleResponse(final HttpResponse response) throws IOException {
