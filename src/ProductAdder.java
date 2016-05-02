@@ -1,65 +1,21 @@
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.config.CookieSpecs;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import java.io.File;
-import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-public class ProductAdder {
+public class ProductAdder extends Config{
 
-    private String apiURL = "https://api.vk.com/method/";
-    private int emptyPhotoId = 413141791;
-    private String groupId = "120338153";
     private String token;
     String response;
 
     public ProductAdder() {
         // Получаем access token
-        this.token = getAccessToken();
+        this.token = Authorization.getToken();
 
-    }
-
-
-    private String getAccessToken(){
-
-        // Авторизируемся
-        WebDriver driver = new FirefoxDriver();
-        driver.get("https://oauth.vk.com/authorize?client_id=5437046&display=page&redirect_uri=http://google.com&scope=market,photos&response_type=token&v=5.52");
-
-        WebDriverWait wait = new WebDriverWait(driver, 40);
-        wait.until(ExpectedConditions.urlContains("access_token"));
-        System.out.println("OK");
-
-        // Получаем URL с токеном
-        String url = driver.getCurrentUrl();
-        driver.close();
-
-        // Парсим токен
-        Pattern p = Pattern.compile("(?<=access_token=).*?(?=&)");
-        Matcher m = p.matcher(url);
-        m.find();
-        String token = m.group(0);
-
-        System.out.println("access token: " + token);
-
-        return token;
     }
 
     public void addProduct(Product product){
@@ -91,7 +47,8 @@ public class ProductAdder {
         httppost.setEntity(httpEntity);
         String JSONProductId = POSTSender.send(httppost);
 
-        System.out.println("Product added: " + JSONProductId);
+        CharSequence successMask = "market_item_id";
+        System.out.println(JSONProductId.contains(successMask) ? " - Success" : "Fail");
     }
 
     private int addImage(File imageFile){
@@ -132,6 +89,7 @@ public class ProductAdder {
         String crop_hash = mainJSONobject.get("crop_hash").getAsString();
 
         //DEBUG
+        /*
         System.out.println("Данные для загрузки фото:");
         System.out.println("server: " + server +
                 "\nphoto: " + photo +
@@ -139,6 +97,7 @@ public class ProductAdder {
                 "\nhash: " + hash +
                 "\ncrop_data: " + crop_data +
                 "\ncrop_hash: " + crop_hash);
+        */
 
         // 3 шаг - отправляем полученные данные методу photos.saveMarketPhoto
         httppost = new HttpPost(apiURL + "photos.saveMarketPhoto");
@@ -163,7 +122,6 @@ public class ProductAdder {
         return photoId;
     }
 
-
     private String POSTImage(String url, File imageFile){
 
         HttpEntity entity = MultipartEntityBuilder.create().addBinaryBody("file", imageFile, ContentType.create("application/octet-stream"), imageFile.getName()).build();
@@ -171,7 +129,5 @@ public class ProductAdder {
         httppost.setEntity(entity);
         return POSTSender.send(httppost);
     }
-
-
 
 }
