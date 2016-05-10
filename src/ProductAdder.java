@@ -1,3 +1,4 @@
+import beans.Product;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.apache.http.HttpEntity;
@@ -5,6 +6,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import java.io.File;
+import java.math.BigDecimal;
 import java.nio.charset.Charset;
 
 public class ProductAdder extends Config{
@@ -20,11 +22,12 @@ public class ProductAdder extends Config{
 
     public void addProduct(Product product){
 
-        String productName = product.getName();
-        String productDescription = productName + "\n" + product.getLink();
-        int categoryId = product.getCategoryId();
-        double productPrice = product.getPrice();
-        int isDeleted = product.isDeleted();
+        String name = product.getName();
+        String Description = name + "\n" + product.getLink();
+//        int categoryId = product.getCategoryId();
+        int categoryId = 703; // Красота и здоровье -> Приборы и аксессуары
+        BigDecimal Price = product.getPrice();
+        int deleted = product.getDeleted();
         String imageLink = product.getImageLink();
 
         // Проверяем фото на валидность и соответствие размеру (не мене 400х400)
@@ -36,11 +39,11 @@ public class ProductAdder extends Config{
         HttpEntity httpEntity = MultipartEntityBuilder.create()
                 .addTextBody("owner_id", "-" + groupId)
                 .addTextBody("access_token", token)
-                .addTextBody("name", productName, ContentType.create("text/plain", Charset.forName("UTF-8")))
-                .addTextBody("description", productDescription, ContentType.create("text/plain", Charset.forName("UTF-8")))
+                .addTextBody("name", name, ContentType.create("text/plain", Charset.forName("UTF-8")))
+                .addTextBody("description", Description, ContentType.create("text/plain", Charset.forName("UTF-8")))
                 .addTextBody("category_id", String.valueOf(categoryId))
-                .addTextBody("price", String.valueOf(productPrice))
-                .addTextBody("deleted", String.valueOf(isDeleted))
+                .addTextBody("price", String.valueOf(Price))
+                .addTextBody("deleted", String.valueOf(deleted))
                 .addTextBody("main_photo_id", String.valueOf(photoId))
                 .build();
 
