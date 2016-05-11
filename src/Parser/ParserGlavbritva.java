@@ -1,3 +1,5 @@
+package parser;
+
 import beans.Product;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -11,11 +13,11 @@ import java.util.regex.Pattern;
 
 public class ParserGlavbritva {
 
-    private String host = "http://glavbritva.ru";
-    private String url = host + "/product_list?product_items_per_page=48";
-    private ArrayList<Product> products = new ArrayList<>();
+    private static String host = "http://glavbritva.ru";
+    private static String url = host + "/product_list?product_items_per_page=48";
+    private static ArrayList<Product> products = new ArrayList<>();
 
-    public ArrayList<Product> parse() {
+    public static ArrayList<Product> parse() {
 
         // Открываем первую страницу с товарами
         try {
@@ -51,7 +53,7 @@ public class ParserGlavbritva {
         return products;
     }
 
-    private void parseItems(String url) {
+    private static void parseItems(String url) {
 
         // Парсим товары
         Document doc = null;
@@ -104,7 +106,7 @@ public class ParserGlavbritva {
         }
     }
 
-    public BigDecimal priceToBigDecimal(String price){
+    private static BigDecimal priceToBigDecimal(String price){
 
         price = price.replaceAll("[\\u00A0|\\s]","");
         String price3 = price.replace(',','.');
