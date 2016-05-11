@@ -1,3 +1,5 @@
+package parser;
+
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.MalformedURLException;
