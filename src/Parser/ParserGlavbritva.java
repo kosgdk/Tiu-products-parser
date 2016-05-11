@@ -50,6 +50,7 @@ public class ParserGlavbritva {
             e.printStackTrace();
         }
 
+        System.out.println("Total products parsed: " + products.size());
         return products;
     }
 
@@ -67,9 +68,8 @@ public class ParserGlavbritva {
 
         for (Element item:items) {
 
-            String id = item.select("span").first().attr("title");
+//            String id = item.select("span").first().attr("title");
             String link = item.select("a").first().attr("href");
-            System.out.println("Link = " + link);
             Element imageElement = item.select("img").first();
             String imageLink = imageElement.attr("src");
 
@@ -82,22 +82,22 @@ public class ParserGlavbritva {
 
             String name = imageElement.attr("alt");
             String stringPrice = item.select("div[class=b-product-line__price-bar]").select("div").last().text();
-            BigDecimal price =  priceToBigDecimal(stringPrice);
+            BigDecimal price =  priceToBigDecimal(stringPrice).setScale(2);
             String strAvailable = item.select("span[class=b-product-line__state]").first().text();
             int deleted = strAvailable.equals("В наличии") ? 0 : 2;
 
-            System.out.println( "ID: "+ id + "\n" +
-                    "Link: " + link + "\n" +
-                    "Image: " + imageLink + "\n" +
-                    "Name: " + name + "\n" +
-                    "Price: " + price + "\n" +
-                    "Available: " + strAvailable + "\n"
-            );
+//            System.out.println( "ID: "+ id + "\n" +
+//                    "Link: " + link + "\n" +
+//                    "Image: " + imageLink + "\n" +
+//                    "Name: " + name + "\n" +
+//                    "Price: " + price + "\n" +
+//                    "Available: " + strAvailable + "\n"
+//            );
 
             Product product = new Product();
-            product.setId(escapeSymbols(id));
-            product.setName(escapeSymbols(name));
-            product.setLink(link);
+//            product.setId(id);
+            product.setId(link);
+            product.setName(name);
             product.setImageLink(imageLink);
             product.setDeleted(deleted);
             product.setPrice(price);
@@ -120,12 +120,6 @@ public class ParserGlavbritva {
         }
 
         return bdPrice;
-    }
-
-    private static String escapeSymbols(String string){
-
-        return string.replace("\'","\\\'");
-
     }
 
 }
