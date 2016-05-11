@@ -1,12 +1,13 @@
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+package vk;
+
+import beans.Product;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 
 import java.util.HashMap;
 
-public class ParserVK extends Config{
+public class ParserVK extends Config {
 
     private static HashMap<String, Product> productsVK = new HashMap<>();
 
