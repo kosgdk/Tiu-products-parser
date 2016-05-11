@@ -1,3 +1,6 @@
+package vk;
+
+import parser.ImageChecker;
 import beans.Product;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -9,10 +12,14 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 
-public class ProductAdder extends Config{
+public class ProductAdder extends Config {
+
+    //TODO: rename to VKWorker
+    //TODO: make all methods static
+    //TODO: add updateProduct method
 
     private String token;
-    String response;
+    private String response;
 
     public ProductAdder() {
         // Получаем access token
@@ -23,7 +30,7 @@ public class ProductAdder extends Config{
     public void addProduct(Product product){
 
         String name = product.getName();
-        String Description = name + "\n" + product.getLink();
+        String Description = name;
 //        int categoryId = product.getCategoryId();
         int categoryId = 703; // Красота и здоровье -> Приборы и аксессуары
         BigDecimal Price = product.getPrice();
