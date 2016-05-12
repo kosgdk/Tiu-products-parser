@@ -1,4 +1,4 @@
-package database;
+package databasetemp;
 
 import beans.Product;
 
@@ -27,9 +27,9 @@ public class DBWorker {
             rsTables.last();
 
             if (rsTables.getRow() == 1){
-                System.out.println("database table \"products\" was successfully found.");
+                System.out.println("databasetemp table \"products\" was successfully found.");
             } else {
-                System.out.println("database table \"products\" was not found. \n Creating new table...");
+                System.out.println("databasetemp table \"products\" was not found. \n Creating new table...");
                 createTable();
             }
 
@@ -127,7 +127,7 @@ public class DBWorker {
             e.printStackTrace();
         }
 
-        System.out.println("Total products read from database: " + products.size());
+        System.out.println("Total products read from databasetemp: " + products.size());
         return products;
     }
 

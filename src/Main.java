@@ -1,8 +1,7 @@
 import beans.Product;
-import database.DBWorker;
-import parser.ParserGlavbritva;
+import databasetemp.DBWorker;
+import parsertemp.ParserGlavbritva;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
@@ -20,8 +19,8 @@ public class Main {
         /*
         System.out.println("\n-----------------------------------\n\nTOTAL: " + products.size() + " products");
 
-        database.DBWorker.checkTable();
-        database.DBWorker.addProducts(products);
+        databasetemp.DBWorker.checkTable();
+        databasetemp.DBWorker.addProducts(products);
         */
 
         /*

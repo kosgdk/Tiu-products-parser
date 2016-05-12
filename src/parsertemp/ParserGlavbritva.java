@@ -1,4 +1,4 @@
-package parser;
+package parsertemp;
 
 import beans.Product;
 import org.jsoup.Jsoup;
