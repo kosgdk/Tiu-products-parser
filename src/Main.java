@@ -1,6 +1,6 @@
 import beans.Product;
-import databasetemp.DBWorker;
-import parsertemp.ParserGlavbritva;
+import database.DBWorker;
+import parser.ParserGlavbritva;
 
 import java.util.ArrayList;
 import java.util.TreeMap;
@@ -19,8 +19,8 @@ public class Main {
         /*
         System.out.println("\n-----------------------------------\n\nTOTAL: " + products.size() + " products");
 
-        databasetemp.DBWorker.checkTable();
-        databasetemp.DBWorker.addProducts(products);
+        database.DBWorker.checkTable();
+        database.DBWorker.addProducts(products);
         */
 
         /*

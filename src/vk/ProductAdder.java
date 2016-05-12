@@ -1,6 +1,6 @@
 package vk;
 
-import parsertemp.ImageChecker;
+import parser.ImageChecker;
 import beans.Product;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;

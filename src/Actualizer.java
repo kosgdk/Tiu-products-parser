@@ -1,4 +1,4 @@
-import databasetemp.DBWorker;
+import database.DBWorker;
 import beans.Product;
 
 import java.math.BigDecimal;

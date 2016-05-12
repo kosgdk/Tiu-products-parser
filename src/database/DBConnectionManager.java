@@ -1,4 +1,4 @@
-package databasetemp;
+package database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -43,7 +43,7 @@ public class DBConnectionManager{
 
         try {
             connection = DriverManager.getConnection(CONNECTION_STRING, USERNAME, PASSWORD);
-            System.out.println("Successfully connected to databasetemp!");
+            System.out.println("Successfully connected to database!");
         } catch (SQLException e) {
             e.printStackTrace();
         }

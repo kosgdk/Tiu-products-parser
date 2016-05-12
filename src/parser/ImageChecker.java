@@ -1,4 +1,4 @@
-package parsertemp;
+package parser;
 
 import java.awt.image.BufferedImage;
 import java.io.*;
