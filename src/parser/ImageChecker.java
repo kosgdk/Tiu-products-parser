@@ -12,15 +12,13 @@ import javax.imageio.ImageIO;
 
 public class ImageChecker {
 
-    private File imageFile = null;
+    private static File imageFile = null;
 
-    public File getImageFile(String url){
-
+    public static File getImageFile(String url){
         return check(url) ? imageFile : new File("empty.jpg");
-
     }
 
-    public boolean check(String url) {
+    private static boolean check(String url) {
 
         imageFile = new File("temp.jpg");
 
