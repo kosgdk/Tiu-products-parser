@@ -11,6 +11,7 @@ public class Product {
     private String imageLink;
     private int deleted;
     private BigDecimal price;
+    private int vkPhotoId;
 
 
     public Product() {}
@@ -70,6 +71,14 @@ public class Product {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public int getVkPhotoId() {
+        return vkPhotoId;
+    }
+
+    public void setVkPhotoId(int vkPhotoId) {
+        this.vkPhotoId = vkPhotoId;
     }
 
     @Override
