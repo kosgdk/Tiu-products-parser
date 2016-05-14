@@ -1,6 +1,8 @@
 package beans;
 
 import java.math.BigDecimal;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class Product {
 
@@ -15,6 +17,27 @@ public class Product {
 
 
     public Product() {}
+
+    public static Product createProduct(ResultSet resultSet){
+
+        Product product = new Product();
+
+        try {
+            product.setId(resultSet.getString("id"));
+            product.setName(resultSet.getString("name"));
+            product.setPrice(resultSet.getBigDecimal("price"));
+            product.setImageLink(resultSet.getString("imagelink"));
+            product.setDeleted(resultSet.getInt("deleted"));
+            product.setVkId(resultSet.getInt("vkid"));
+            product.setVkPhotoId(resultSet.getInt("vkphotoid"));
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return product;
+
+    }
 
 
     public String getId() {
