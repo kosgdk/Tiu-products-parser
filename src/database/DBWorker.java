@@ -14,6 +14,88 @@ public class DBWorker {
         checkTable();
     }
 
+    public static void addProducts(ArrayList<Product> products){
+
+        Iterator<Product> iterator = products.iterator();
+
+        while (iterator.hasNext()){
+            addProduct(iterator.next());
+        }
+
+    }
+
+    public static void addProduct(Product product){
+
+        String SQL = "INSERT INTO " + tableName + " (id, name, price, imagelink, deleted) VALUES ('" +
+                escapeSymbols(product.getId()) + "', '" +
+                escapeSymbols(product.getName()) + "', " +
+                product.getPrice() + ", '" +
+                product.getImageLink() + "', " +
+                product.getDeleted() + ")";
+
+//        System.out.println(SQL);
+        executeUpdate(SQL);
+
+    }
+
+    public static void updateProduct(Product product){
+
+        String SQL = "UPDATE " + tableName + "SET " +
+                "price = " + product.getPrice() + ", " +
+                "deleted = " + product.getDeleted() + ", " +
+                "vkid = " + product.getVkId() + ", " +
+                "vkphotoid = " + product.getVkPhotoId() +
+                " WHERE id = '" + product.getId() + "'";
+
+        System.out.println(SQL);
+        executeUpdate(SQL);
+    }
+
+    public static TreeMap<String, Product> getAllProducts(){
+
+        System.out.println("Retrieving all products from database:");
+        TreeMap<String, Product> products = new TreeMap<>();
+        String sql = "SELECT * FROM " + tableName + ";";
+        ArrayList<Product> productsAL = getProducts(sql);
+
+        for (Product product : productsAL) {
+            products.put(product.getId(), product);
+        }
+
+        System.out.println("Total products read from database: " + products.size());
+        return products;
+    }
+
+    public static ArrayList<Product> getUnaddedProducts(){
+
+        System.out.println("Getting products from dataase, which weren't added to VK:");
+        String sql = "SELECT * FROM " + tableName + " WHERE vkid IS NULL OR vkphotoid IS NULL;";
+        ArrayList<Product> products = getProducts(sql);
+        System.out.println("Total products read from database: " + products.size());
+        return products;
+    }
+
+    private static ArrayList<Product> getProducts(String sql){
+
+        ArrayList<Product> products = new ArrayList<>();
+        Product productObject;
+
+        try {
+            Statement statement = connection.createStatement();
+            ResultSet rsProducts = statement.executeQuery(sql);
+
+            while (rsProducts.next()) {
+                productObject = Product.createProduct(rsProducts);
+                products.add(productObject);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return products;
+    }
+
     private static void checkTable(){
 
         String[] tableTypes = {"TABLE"};
@@ -58,77 +140,6 @@ public class DBWorker {
                 "  PRIMARY KEY (`id`));";
 
         executeUpdate(SQL);
-    }
-
-    public static void addProducts(ArrayList<Product> products){
-
-        Iterator<Product> iterator = products.iterator();
-
-        while (iterator.hasNext()){
-            addProduct(iterator.next());
-        }
-
-    }
-
-    public static void addProduct(Product product){
-
-        String SQL = "INSERT INTO " + tableName + " (id, name, price, imagelink, deleted) VALUES ('" +
-                escapeSymbols(product.getId()) + "', '" +
-                escapeSymbols(product.getName()) + "', " +
-                product.getPrice() + ", '" +
-                product.getImageLink() + "', " +
-                product.getDeleted() + ")";
-
-//        System.out.println(SQL);
-        executeUpdate(SQL);
-
-    }
-
-    public static void updateProduct(Product product){
-
-        String SQL = "UPDATE " + tableName + "SET " +
-                "price = " + product.getPrice() + ", " +
-                "deleted = " + product.getDeleted() +
-                " WHERE id = '" + product.getId() + "'";
-
-        System.out.println(SQL);
-        executeUpdate(SQL);
-    }
-
-    public static TreeMap<String, Product> getProducts(){
-
-        System.out.println("Reading data from dataase:");
-
-        TreeMap<String, Product> products = new TreeMap<>();
-
-        String SQL = "SELECT * FROM " + tableName + ";";
-        Product productObject = null;
-
-        try {
-
-            Statement statement = connection.createStatement();
-            ResultSet rsProducts = statement.executeQuery(SQL);
-
-            while (rsProducts.next()) {
-
-                productObject = new Product();
-
-                productObject.setId(rsProducts.getString("id"));
-                productObject.setName(rsProducts.getString("name"));
-                productObject.setPrice(rsProducts.getBigDecimal("price"));
-                productObject.setImageLink(rsProducts.getString("imagelink"));
-                productObject.setDeleted(rsProducts.getInt("deleted"));
-
-                products.put(productObject.getId(), productObject);
-//                System.out.println(productObject + "\n");
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        System.out.println("Total products read from database: " + products.size());
-        return products;
     }
 
     private static void executeUpdate(String SQL){
