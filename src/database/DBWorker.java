@@ -1,7 +1,6 @@
 package database;
 
 import beans.Product;
-
 import java.sql.*;
 import java.util.*;
 
@@ -14,46 +13,40 @@ public class DBWorker {
         checkTable();
     }
 
-    public static void addProducts(ArrayList<Product> products){
-
-        Iterator<Product> iterator = products.iterator();
-
-        while (iterator.hasNext()){
-            addProduct(iterator.next());
-        }
-
-    }
-
     public static void addProduct(Product product){
 
-        String SQL = "INSERT INTO " + tableName + " (id, name, price, imagelink, deleted) VALUES ('" +
-                escapeSymbols(product.getId()) + "', '" +
+        System.out.print("Adding product \"" + product.getName() + "\" in database... ");
+
+        String SQL = "INSERT INTO " + tableName + " (id, vkid, name, price, imagelink, deleted, vkphotoid) VALUES ('" +
+                escapeSymbols(product.getId()) + "', " +
+                product.getVkId() + ", '" +
                 escapeSymbols(product.getName()) + "', " +
                 product.getPrice() + ", '" +
                 product.getImageLink() + "', " +
-                product.getDeleted() + ")";
+                product.getDeleted() + ", " +
+                product.getVkPhotoId() + ")";
 
-//        System.out.println(SQL);
         executeUpdate(SQL);
 
     }
 
     public static void updateProduct(Product product){
 
-        String SQL = "UPDATE " + tableName + "SET " +
+        System.out.print("Updating product \"" + product.getName() + "\" in database... ");
+
+        String SQL = "UPDATE " + tableName + " SET " +
                 "price = " + product.getPrice() + ", " +
                 "deleted = " + product.getDeleted() + ", " +
                 "vkid = " + product.getVkId() + ", " +
                 "vkphotoid = " + product.getVkPhotoId() +
                 " WHERE id = '" + product.getId() + "'";
 
-        System.out.println(SQL);
         executeUpdate(SQL);
     }
 
     public static TreeMap<String, Product> getAllProducts(){
 
-        System.out.println("Retrieving all products from database:");
+        System.out.print("Retrieving all products from database... ");
         TreeMap<String, Product> products = new TreeMap<>();
         String sql = "SELECT * FROM " + tableName + ";";
         ArrayList<Product> productsAL = getProducts(sql);
@@ -62,16 +55,16 @@ public class DBWorker {
             products.put(product.getId(), product);
         }
 
-        System.out.println("Total products read from database: " + products.size());
+        System.out.println(products.size() + " products was retrieved");
         return products;
     }
 
     public static ArrayList<Product> getUnaddedProducts(){
 
-        System.out.println("Getting products from dataase, which weren't added to VK:");
-        String sql = "SELECT * FROM " + tableName + " WHERE vkid IS NULL OR vkphotoid IS NULL;";
+        System.out.println("Getting products from database, which weren't added to VK... ");
+        String sql = "SELECT * FROM " + tableName + " WHERE vkid=0 OR vkphotoid=0;";
         ArrayList<Product> products = getProducts(sql);
-        System.out.println("Total products read from database: " + products.size());
+        System.out.println(products.size() + " retrieved");
         return products;
     }
 
@@ -109,20 +102,24 @@ public class DBWorker {
             rsTables.last();
 
             if (rsTables.getRow() == 1){
-                System.out.println("database table \"products\" was successfully found.");
+                System.out.println("Database table \"products\" was successfully found.");
             } else {
-                System.out.println("database table \"products\" was not found. \n Creating new table...");
+                System.out.println("Database table \"products\" was not found. \n Creating new table...");
                 createTable();
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            try {
-                rsTables.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
+
+            if (rsTables != null) {
+                try {
+                    rsTables.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
+
         }
 
     }
@@ -148,8 +145,11 @@ public class DBWorker {
             Statement statement = connection.prepareStatement(SQL);
             statement.executeUpdate(SQL);
         } catch (SQLException e) {
+            System.out.println("fail");
             e.printStackTrace();
         }
+
+        System.out.println("success!");
 
     }
 
