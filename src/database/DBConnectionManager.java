@@ -27,12 +27,12 @@ public class DBConnectionManager{
         return connection;
     }
 
-    public void closeConnection(){
+    public static void closeConnection(){
 
         if (connection != null){
             try {
                  connection.close();
-                System.out.println("Connection successfully closed/");
+                System.out.println("Connection to database successfully closed");
             } catch (SQLException e) {
                 e.printStackTrace();
             }
