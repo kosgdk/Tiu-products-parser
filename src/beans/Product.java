@@ -106,11 +106,12 @@ public class Product {
 
     @Override
     public String toString() {
-        return "id: " + id + "\n" +
-                "name: " + name + "\n" +
-                "link: " + link + "\n" +
-                "image: " + imageLink + "\n" +
+        return "name: " + name + "\n" +
                 "price: " + price + "\n" +
+                "id: " + id + "\n" +
+                "image: " + imageLink + "\n" +
+                "vkid: " + vkId + "\n" +
+                "vkImageId: " + vkPhotoId + "\n" +
                 "deleted: " + deleted
                 ;
     }
