@@ -7,7 +7,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,9 +15,9 @@ public class ParserGlavbritva {
 
     private static String host = "http://glavbritva.ru";
     private static String url = host + "/product_list?product_items_per_page=48";
-    private static ArrayList<Product> products = new ArrayList<>();
+    private static HashMap<String, Product> products = new HashMap<>();
 
-    public static ArrayList<Product> parse() {
+    public static HashMap<String, Product> parse() {
 
         // Открываем первую страницу с товарами
         try {
@@ -37,7 +37,7 @@ public class ParserGlavbritva {
                 //System.out.println(pagesLinks[i]);
             }
 
-            System.out.println("Parsing page:");
+            System.out.println("Parsing products from " + host + " page:");
             int i = 1;
             // Парсим товары с каждой страницы
             for (String pagesLink : pagesLinks) {
@@ -102,7 +102,7 @@ public class ParserGlavbritva {
             product.setDeleted(deleted);
             product.setPrice(price);
 
-            products.add(product);
+            products.put(link, product);
         }
     }
 
