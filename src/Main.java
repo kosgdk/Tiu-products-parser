@@ -1,55 +1,44 @@
 import beans.Product;
+import database.DBConnectionManager;
 import database.DBWorker;
 import parser.ParserGlavbritva;
+import vk.VKWorker;
 
-import java.util.ArrayList;
-import java.util.TreeMap;
+import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
 
+        HashMap<String, Product> parsedProducts = ParserGlavbritva.parse();
+        Actualizer.actualize(parsedProducts);
 
+        ArrayList<Product> unaddedProducts = DBWorker.getUnaddedProducts();
 
-        ArrayList<Product> parsdProducts = ParserGlavbritva.parse();
-        TreeMap<String, Product> dbProducts = DBWorker.getProducts();
-        Actualizer.actualize(parsdProducts, dbProducts);
-
-
-//        String token = vk.Authorization.getToken();
-        /*
-        System.out.println("\n-----------------------------------\n\nTOTAL: " + products.size() + " products");
-
-        database.DBWorker.checkTable();
-        database.DBWorker.addProducts(products);
-        */
-
-        /*
-        vk.ProductAdder productAdder = new vk.ProductAdder();
-
-
-
-        System.out.println("Adding products to vk:");
-
-        int k = 0;
-        int n = 10;
-
-        for(int i=k ; i<n ; i++){
-            System.out.print(i+1 + " of " + n);
-            productAdder.addProduct(products.get(i));
+        if (unaddedProducts.size() > 0) {
+            System.out.println("Trying to add not added before products into VK group:");
+            for (Product product : unaddedProducts) {
+                Product addedProduct = VKWorker.addProduct(product);
+                if (addedProduct != null) {
+                    DBWorker.updateProduct(addedProduct);
+                }
+            }
         }
-        */
 
-        /*
-        beans.Product testProduct = new beans.Product(  "Venus Swirl-2",
-                                            "Кассета для станков для бритья GILLETTE Swirl (типа Embrace), 2 шт.",
-                                            "http://glavbritva.ru/p185411388-kasseta-dlya-stankov.html",
-                                            "http://images.ru.prom.st/265417830_w640_h640_1014274783.jpg",
-                                            true,
-                                            99.85);
+        DBConnectionManager.closeConnection();
 
-        vk.ProductAdder productAdder = new vk.ProductAdder();
-        productAdder.addProduct(testProduct);
-        */
+
+//        Product testProduct = new Product();
+//        testProduct.setId("http://glavbritva.ru/p27883003-stanok-dlya-britya.html");
+//        testProduct.setVkId(211859);
+//        testProduct.setName("Станок для бритья одноразовый DORCO TG-711 c 2 лезвиями, плавающей головкой и удлиненной ручкой, 5 шт.");
+//        testProduct.setPrice(new BigDecimal(88));
+//        testProduct.setImageLink("http://images.ru.prom.st/50065926_w640_h640_tg71141p2.png");
+//        testProduct.setDeleted(0);
+//        testProduct.setVkPhotoId(415383583);
+//
+//        VKWorker.updateProduct(testProduct);
+
+
     }
 
 }
