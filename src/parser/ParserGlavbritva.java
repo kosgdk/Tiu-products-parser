@@ -7,51 +7,101 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ParserGlavbritva {
 
+    private static String[] excludedProducts = new String[]{
+            "http://glavbritva.ru/p50083274-poroshok-stiralnyj-burti.html",
+            "http://glavbritva.ru/p112290298-poroshok-stiralnyj-kontsentrat.html",
+            "http://glavbritva.ru/p50618163-poroshok-stiralnyj-burti.html",
+            "http://glavbritva.ru/p50717139-sredstvo-dlya-stirki.html",
+            "http://glavbritva.ru/p73336862-sredstvo-dlya-stirki.html"};
+
     private static String host = "http://glavbritva.ru";
-    private static String url = host + "/product_list?product_items_per_page=48";
+    private static String url = host + "/product_list";
     private static HashMap<String, Product> products = new HashMap<>();
 
-    public static HashMap<String, Product> parse() {
+    private static int n = 0;
+
+    public static HashMap<String, Product> parse(){
+
+        try {
+            Document doc = Jsoup.connect(host + "/product_list").get();
+
+            Elements categories = doc.select("li[class=b-product-groups__item]");
+            System.out.println("Total categories: " + categories.size());
+
+            for (Element element : categories) {
+                String categoryUrl = host + element.select("a").first().attr("href");
+                System.out.println("Parsing category: " + element.select("a").first().attr("title"));
+                parseCategory(categoryUrl);
+            }
+
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+
+        return products;
+    }
+
+    private static void parseCategory(String url) {
+
+        n = 0;
+
+//        url = url + "?product_items_per_page=48";
 
         // Открываем первую страницу с товарами
         try {
-            Document doc=Jsoup.connect(url).get();
-            Elements firstStage = doc.select("div[class=b-pager]");
+            Document doc=Jsoup.connect(url + "?product_items_per_page=48").get();
 
-            // Получаем количество страниц с товарами
-            int pagesCount = Integer.parseInt(firstStage.first().select("a[class= b-pager__link ]").last().text());
-            //System.out.println("Total pages: " + pagesCount);
+            // Проверяем, есть ли на странице paging
+            Elements pagingElements = doc.select("div[class=b-pager ]");
 
-
-
-            // Генерируем ссылки на страницы с товарами
-            String pagesLinks[] = new String[pagesCount];
-            for (int i = 0; i < pagesCount; i++) {
-                pagesLinks[i] = host + "/product_list/page_" + (i+1) + "?product_items_per_page=48";
-                //System.out.println(pagesLinks[i]);
+            if (pagingElements.size() > 0) {
+                String pagingLinks[] = parsePaging(url, pagingElements.first());
+                int pageCounter = 1;
+                for (String pageUrl : pagingLinks) {
+                    System.out.println("Parsing page " + pageCounter + "/" + pagingLinks.length);
+                    pageCounter++;
+                    parseItems(pageUrl);
+                    sleep(1000);
+                }
+            } else {
+                parseItems(url + "?product_items_per_page=48");
+                sleep(1000);
             }
 
-            System.out.println("Parsing products from " + host + " page:");
-            int i = 1;
-            // Парсим товары с каждой страницы
-            for (String pagesLink : pagesLinks) {
-                System.out.println(i++ + " of " + pagesCount);
-                parseItems(pagesLink);
-            }
+            System.out.println("Items parsed in category: " + n);
 
         }catch (IOException e){
             System.out.println("Some problems opening page: " + url);
             e.printStackTrace();
         }
 
-        System.out.println("Total products parsed: " + products.size());
-        return products;
+//        System.out.println("Total products parsed: " + products.size());
+    }
+
+    private static String[] parsePaging (String url, Element element){
+
+        // Получаем количество страниц с товарами
+        int pagesCount = (Integer.parseInt(element.select("a[class=b-pager__link]").last().text()));
+
+        System.out.println("Pages: " + (pagesCount));
+
+        // Генерируем ссылки на страницы с товарами
+        String[] pagesLinks = new String[pagesCount];
+
+        for (int i = 0; i < (pagesCount); i++) {
+            pagesLinks[i] = url + "/page_" + (i+1) + "?product_items_per_page=48";
+            //System.out.println(pagesLinks[i]);
+        }
+
+        return pagesLinks;
+
     }
 
     private static void parseItems(String url) {
@@ -103,6 +153,8 @@ public class ParserGlavbritva {
             product.setPrice(price);
 
             products.put(link, product);
+
+            n++;
         }
     }
 
@@ -120,6 +172,15 @@ public class ParserGlavbritva {
         }
 
         return bdPrice;
+    }
+
+    private static void sleep(int time){
+        try {
+            Thread.sleep(time);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
     }
 
 }
