@@ -9,60 +9,31 @@ import parser.ParserGlavbritva;
 import vk.VKWorker;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
 
-//        HashMap<String, Product> parsedProducts = ParserGlavbritva.parseCategory();
-//        Actualizer.actualize(parsedProducts);
-//
-//        ArrayList<Product> unaddedProducts = DBWorker.getUnaddedProducts();
-//
-//        if (unaddedProducts.size() > 0) {
-//            System.out.println("Trying to add not added before products into VK group:");
-//            for (Product product : unaddedProducts) {
-//                Product addedProduct = VKWorker.addProduct(product);
-//                if (addedProduct != null) {
-//                    DBWorker.updateProduct(addedProduct);
-//                }
-//            }
-//        }
-//
-//        DBConnectionManager.closeConnection();
-
+        // СИНХРОНИЗАЦИЯ ТОВАРОВ В ГРУППЕ ВК С САЙТОМ ПОСТАВЩИКА
         HashMap<String, Product> parsedProducts = ParserGlavbritva.parse();
-        System.out.println("\n---------------------------\nTotal items parsed: " + parsedProducts.size());
+        Actualizer.actualize(parsedProducts);
+        DBConnectionManager.closeConnection();
 
+          // УДАЛЕНИЕ ВСЕХ ТОВАРОВ ИЗ ГРУППЫ ВК
+//        TreeMap<String, Product> dbProducts = DBWorker.getAllProducts();
+//        dbProducts.forEach((s, product) -> VKWorker.deleteProduct(product));
 
-
-
-//        HashMap<String, Product> parsedProducts = ParserGlavbritva.parseCategory();
-//        parsedProducts.forEach((s, product) -> System.out.println(product.getId()));
-//        System.out.println("Total parsed products: " + parsedProducts.size());
+          // ДОБАВЛЕНИЕ ТОВАРОВ В ПОДБОРКУ
+//        ParserGlavbritva.parseCategory("http://glavbritva.ru/g3770505-podarochnye-nabory");
+//        HashMap<String, Product> parsedPproducts = ParserGlavbritva.getProducts();
+//        System.out.println(parsedPproducts.size());
+//        HashMap<String, Product> dbPproducts = DBWorker.getAllProducts();
 //
-//        for (String excludedProductId : ParserGlavbritva.excludedProducts) {
-//            System.out.println(excludedProductId);
-//            if (parsedProducts.containsKey(excludedProductId)) {
-//                System.out.println("Excluding product: " + parsedProducts.get(excludedProductId).getName());
-//                parsedProducts.remove(excludedProductId);
-//            }
+//        for (Map.Entry<String, Product> parsedProductEntry : parsedPproducts.entrySet()){
+//            Product product = dbPproducts.get(parsedProductEntry.getKey());
+//            VKWorker.setCategory(product, 39);
 //        }
-//        System.out.println("Total products after excluding: " + parsedProducts.size());
-
-
-
-
-//        Product testProduct = new Product();
-//        testProduct.setId("http://glavbritva.ru/p27883003-stanok-dlya-britya.html");
-//        testProduct.setVkId(211859);
-//        testProduct.setName("Станок для бритья одноразовый DORCO TG-711 c 2 лезвиями, плавающей головкой и удлиненной ручкой, 5 шт.");
-//        testProduct.setPrice(new BigDecimal(88));
-//        testProduct.setImageLink("http://images.ru.prom.st/50065926_w640_h640_tg71141p2.png");
-//        testProduct.setDeleted(0);
-//        testProduct.setVkPhotoId(415383583);
-//
-//        VKWorker.updateProduct(testProduct);
 
 
     }
