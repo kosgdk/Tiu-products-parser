@@ -10,12 +10,28 @@ import java.util.TreeMap;
 
 public class Actualizer {
 
+    private static HashMap<String, Product> dbProducts = DBWorker.getAllProducts();
+    private static ArrayList<Product> updatedProducts = new ArrayList<>();
+    private static ArrayList<Product> addedProducts = new ArrayList<>();
+    private static ArrayList<Product> errorProducts = new ArrayList<>();
+
     public static void actualize(HashMap<String, Product> parsedProducts){
 
-        TreeMap<String, Product> dbProducts = DBWorker.getAllProducts();
-        ArrayList<Product> updatedProducts = new ArrayList<>();
-        ArrayList<Product> addedProducts = new ArrayList<>();
-        ArrayList<Product> errorProducts = new ArrayList<>();
+        // Добавляем в ВК товары, которые есть в БД, но нет в ВК
+        ArrayList<Product> unAddedProducts = DBWorker.getUnaddedProducts();
+
+        if (unAddedProducts.size() > 0) {
+            System.out.println("Публикуем в ВК продукты, не опубликованные с прошлого раза: " + unAddedProducts.size() + " шт.");
+            for (Product unAddedProduct : unAddedProducts) {
+                Product addedProduct = VKWorker.addProduct(unAddedProduct);
+                if (addedProduct != null) {
+                    DBWorker.updateProduct(addedProduct);
+                    addedProducts.add(addedProduct);
+                } else {
+                    errorProducts.add(unAddedProduct);
+                }
+            }
+        }
 
         // Проверяем, есть ли вообще у поставщика наши товары
         for (Map.Entry<String, Product> dbProductEntry : dbProducts.entrySet()) {
@@ -66,20 +82,25 @@ public class Actualizer {
             }
             // Если продукт новый и его нет в базе
             else {
-                // Добавляем продукт в группу ВК. Если успешно...
-                Product addedProduct = VKWorker.addProduct(parsedProduct);
-                if (addedProduct != null) {
-                    // Добавляем продукт в БД.
-                    DBWorker.addProduct(addedProduct);
-                    addedProducts.add(addedProduct);
+                // Публикуем продукт в группу ВК.
+                Product publishedProduct = VKWorker.addProduct(parsedProduct);
+
+                if (publishedProduct != null) {
+                    // Добавляем опубликованный продукт c заполненными VkId и VkPhotoId в БД.
+                    DBWorker.addProduct(publishedProduct);
+                    // Добавляем опубликованный продукт в соответствующую коллекцию
+                    addedProducts.add(publishedProduct);
                 } else {
+                    // Добавляем неопубликованный продукт в БД
+                    DBWorker.addProduct(parsedProduct);
+                    // Добавляем опубликованный продукт в соответствующую коллекцию
                     errorProducts.add(parsedProduct);
                 }
             }
 
         }
 
-        System.out.println("Products updated: " + updatedProducts.size());
+        System.out.println("\nProducts updated: " + updatedProducts.size());
         System.out.println("New products added: " + addedProducts.size());
 
         if (errorProducts.size() > 0){
