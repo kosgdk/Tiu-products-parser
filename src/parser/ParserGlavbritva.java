@@ -25,6 +25,10 @@ public class ParserGlavbritva {
     private static String url = host + "/product_list";
     private static HashMap<String, Product> products = new HashMap<>();
 
+    public static HashMap<String, Product> getProducts() {
+        return products;
+    }
+
     private static int n = 0;
 
     public static HashMap<String, Product> parse(){
@@ -45,10 +49,11 @@ public class ParserGlavbritva {
             e.printStackTrace();
         }
 
+        System.out.println("\n----------------------------------------\nВсего спаршено товаров: " + products.size() + "\n");
         return products;
     }
 
-    private static void parseCategory(String url) {
+    public static void parseCategory(String url) {
 
         n = 0;
 
@@ -174,7 +179,7 @@ public class ParserGlavbritva {
         return bdPrice;
     }
 
-    private static void sleep(int time){
+    public static void sleep(int time){
         try {
             Thread.sleep(time);
         } catch (InterruptedException e) {
