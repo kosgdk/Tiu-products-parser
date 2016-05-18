@@ -44,10 +44,10 @@ public class DBWorker {
         executeUpdate(SQL);
     }
 
-    public static TreeMap<String, Product> getAllProducts(){
+    public static HashMap<String, Product> getAllProducts(){
 
         System.out.print("Retrieving all products from database... ");
-        TreeMap<String, Product> products = new TreeMap<>();
+        HashMap<String, Product> products = new HashMap<>();
         String sql = "SELECT * FROM " + tableName + ";";
         ArrayList<Product> productsAL = getProducts(sql);
 
@@ -134,6 +134,7 @@ public class DBWorker {
                 "  `price` DECIMAL(7,2) NOT NULL,\n" +
                 "  `imagelink` NVARCHAR(300) NOT NULL,\n" +
                 "  `deleted` TINYINT(1) NOT NULL,\n" +
+                "  `vkphotoid` INT(11) NULL,\n" +
                 "  PRIMARY KEY (`id`));";
 
         executeUpdate(SQL);
