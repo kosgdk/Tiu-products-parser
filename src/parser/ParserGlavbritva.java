@@ -7,6 +7,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Matcher;
@@ -31,7 +33,7 @@ public class ParserGlavbritva {
 
     private static int n = 0;
 
-    public static HashMap<String, Product> parse(){
+    public static HashMap<String, Product> parse() throws SocketTimeoutException {
 
         try {
             Document doc = Jsoup.connect(host + "/product_list").get();
@@ -137,7 +139,7 @@ public class ParserGlavbritva {
 
             String name = imageElement.attr("alt");
             String stringPrice = item.select("div[class=b-product-line__price-bar]").select("div").last().text();
-            BigDecimal price =  priceToBigDecimal(stringPrice).setScale(2);
+            BigDecimal price =  priceToBigDecimal(stringPrice).setScale(0, RoundingMode.HALF_UP);
             String strAvailable = item.select("span[class=b-product-line__state]").first().text();
             int deleted = strAvailable.equals("В наличии") ? 0 : 2;
 
