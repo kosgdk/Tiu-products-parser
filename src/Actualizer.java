@@ -101,7 +101,10 @@ public class Actualizer {
         }
 
         System.out.println("\nProducts updated: " + updatedProducts.size());
+        updatedProducts.forEach(product -> System.out.print(" - " + product.getName() + "   price: " + product.getPrice() + "   available: " + product.isAvailable() + "\n"));
+
         System.out.println("New products added: " + addedProducts.size());
+        addedProducts.forEach(product -> System.out.println(" - " + product.getName()));
 
         if (errorProducts.size() > 0){
             System.out.println("There were problems with following products: " + errorProducts.size());
